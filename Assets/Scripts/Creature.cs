@@ -11,7 +11,7 @@ public class Creature : MonoBehaviour
     //Hunger
     public float hunger;
     //Hygiene
-    public float hygiene;
+    public float hygiene = 100;
     //Tiredness
     public float tiredness;
     //IsSick
@@ -21,34 +21,83 @@ public class Creature : MonoBehaviour
 
     //stat timers
     public float tirednessTimer, hungerTimer, poopTimer, sickTimer;
-	
-	// Update is called once per frame
-	void Update ()
+    public float tirednessTimerCap, hungerTimerCap, poopTimerCap, sickTimerCap;
+
+    void Start ()
+    {
+        tirednessTimer = tirednessTimerCap;
+        hungerTimer = hungerTimerCap;
+        poopTimer = poopTimerCap;
+        sickTimer = sickTimerCap;
+    }
+
+    // Update is called once per frame
+    void Update ()
     {
         //Hunger
-        //Timer--
-        //< 75 %, 
-        //Eat
-        //< 20 %, 
-        //Get Sick
+        hungerTimer -= Time.smoothDeltaTime;
+        float hungerPercentage = hungerTimer / hungerTimerCap;
+        if(hungerPercentage < 0.75f)
+        {
+            //Eat
+        }
+        if(hungerPercentage < 0.2f)
+        {
+            //Get Sick
+        }
+
         //Poop
-        //Hunger > 50 %
-        //Timer--
-        //< 0, 
-        //Poop
-        //Reset Timer
+        if (hungerPercentage > 0.5f)
+        {
+            poopTimer -= Time.smoothDeltaTime;
+        }
+        
+        if(poopTimer / poopTimerCap <= 0)
+        {
+            //Poop
+            //Reset Timer
+            poopTimer = poopTimerCap;
+        }
+
         //Tired
-        //Awake?
-        //Timer--
-        //< 0, Sleep
-        //Else
-        //Timer++
-        //> 100, Awake
+        float tirednessPercentage = tirednessTimer / tirednessTimerCap;
+
+        if (isAwake)
+        {
+            tirednessTimer -= Time.smoothDeltaTime;
+            if (tirednessPercentage <= 0)
+            {
+                //< 0, Sleep
+                isAwake = false;
+            }
+        }
+        else
+        {
+            tirednessTimer += Time.smoothDeltaTime;
+            if (tirednessPercentage >= 100)
+            {
+                //< 0, Sleep
+                isAwake = true;
+            }
+        }
+
         //Sick
-        //Hygiene -= PoopNumber * Age
-        //Hygiene < 20 %, Get Sick
+        hygiene -= poopNumber * age;
+        if(hygiene/100 < 0.2f)
+        {
+            //get sick
+            isSick = true;
+        }
         //IsSick?
-        //Timer --
+        if (isSick)
+        {
+            sickTimer -= Time.smoothDeltaTime;
+            if(sickTimer <= 0)
+            {
+                //Spawn gravestone
+                Destroy(gameObject);
+            }
+        }
         //< 0, Die
     }
 
