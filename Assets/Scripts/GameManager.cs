@@ -6,8 +6,8 @@ public class GameManager : MonoBehaviour
     //VARIABLES
     //Creature Prefab
     public GameObject creaturePrefab;
-    //Poop Prefab
     //Food Prefab
+    public GameObject foodPrefab;
 
     //Creature Reference
     private GameObject creatureRef;
@@ -20,7 +20,19 @@ public class GameManager : MonoBehaviour
         {
             Spawn();
         }
-	}
+
+        //This method will clean up after our emojigotchi
+        if(Input.GetKeyDown(KeyCode.C))
+        {
+            Clean();
+        }
+
+        //This method will feed our emojigotchi
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            Feed();
+        }
+    }
 
     //Spawn
     void Spawn()
@@ -30,10 +42,23 @@ public class GameManager : MonoBehaviour
     }
 
     //Clean
+    void Clean()
+    {
         //Remove all poop, reset creature poop number, reset creature hygiene
+        foreach(GameObject currentPoop in GameObject.FindGameObjectsWithTag("Poop"))
+        {
+            Destroy(currentPoop);
+        }
+        creatureRef.GetComponent<Creature>().poopNumber = 0;
+        creatureRef.GetComponent<Creature>().hygiene = 100;
+    }
 
     //Feed
+    void Feed()
+    {
         //Spawn food
+        Instantiate(foodPrefab);
+    }
 
     //Medicate
         //Reduce creature sickness

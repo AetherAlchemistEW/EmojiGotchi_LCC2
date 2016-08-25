@@ -19,9 +19,14 @@ public class Creature : MonoBehaviour
     //IsAwake
     public bool isAwake;
 
+    //Poop Prefab
+    public GameObject poopPrefab;
+
     //stat timers
     public float tirednessTimer, hungerTimer, poopTimer, sickTimer;
     public float tirednessTimerCap, hungerTimerCap, poopTimerCap, sickTimerCap;
+
+    float hungerPercentage;
 
     void Start ()
     {
@@ -29,23 +34,12 @@ public class Creature : MonoBehaviour
         hungerTimer = hungerTimerCap;
         poopTimer = poopTimerCap;
         sickTimer = sickTimerCap;
+        StartCoroutine("HungerSystem");
     }
 
     // Update is called once per frame
     void Update ()
     {
-        //Hunger
-        hungerTimer -= Time.smoothDeltaTime;
-        float hungerPercentage = hungerTimer / hungerTimerCap;
-        if(hungerPercentage < 0.75f)
-        {
-            //Eat
-        }
-        if(hungerPercentage < 0.2f)
-        {
-            //Get Sick
-        }
-
         //Poop
         if (hungerPercentage > 0.5f)
         {
@@ -55,6 +49,7 @@ public class Creature : MonoBehaviour
         if(poopTimer / poopTimerCap <= 0)
         {
             //Poop
+            Poop();
             //Reset Timer
             poopTimer = poopTimerCap;
         }
@@ -101,9 +96,48 @@ public class Creature : MonoBehaviour
         //< 0, Die
     }
 
+    IEnumerator HungerSystem()
+    {
+        //Hunger
+        hungerTimer -= Time.smoothDeltaTime;
+        hungerPercentage = hungerTimer / hungerTimerCap;
+        //Debug.Log("HungerSystem");
+        if (hungerPercentage < 0.75f)
+        {
+            //Debug.Log("Find Food");
+            //Look for food
+            GameObject food = GameObject.FindGameObjectWithTag("Food");
+            //if food 
+            while (food != null)
+            {
+                //Debug.Log("Yay Food!");
+                //move to the food
+                if (Vector2.Distance(transform.position, food.transform.position) <0.5f)
+                {
+                    //eat the food
+                    hungerTimer = hungerTimerCap;
+                    Destroy(food);
+                    //Debug.Log("NomNomNom");
+                }
+                yield return null;
+            }  
+        }
+        if (hungerPercentage < 0.2f)
+        {
+            //Get Sick
+        }
+        yield return null;
+        StartCoroutine("HungerSystem");
+    }
+
     //Poop
+    void Poop()
+    {
         //Spawn Poop
+        Instantiate(poopPrefab, transform.position, Quaternion.identity);
         //Increase Poop Number
+        poopNumber++;
+    }
 
     //Sleep
         //Set asleep, while asleep 
@@ -112,9 +146,6 @@ public class Creature : MonoBehaviour
 
     //Eat
         //Find food, if food move to food, once at food eat
-
-    //GetSick
-        //IsSick
 
     //Die
         //Spawn Headstone
